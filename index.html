@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedarikçi Teklif Toplama ve Satın Alma Portalı | KOBİ B2B RFQ</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text-main); line-height: 1.5; padding: 32px 16px; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; }
+
+        .header {
+            text-align: center; margin-bottom: 24px; background: white; padding: 30px 20px;
+            border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            position: relative; overflow: hidden;
+        }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--primary); }
+        .header-badge {
+            display: inline-block; background: #dbeafe; color: var(--primary);
+            font-size: 0.78rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; margin-bottom: 10px;
+        }
+        .header h1 { font-size: 1.6rem; color: var(--secondary); margin-bottom: 8px; font-weight: 800; }
+        .header p { font-size: 0.9rem; color: var(--text-muted); max-width: 680px; margin: 0 auto; }
+
+        .card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 26px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        }
+        .card-title {
+            font-size: 1.05rem; font-weight: 700; color: var(--secondary); margin-bottom: 18px;
+            display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: span 2; }
+        label { font-size: 0.83rem; font-weight: 600; color: #334155; }
+        label span.req { color: #dc2626; }
+
+        input, select, textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 0.88rem; outline: none; background: #f8fafc; color: var(--text-main);
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        textarea { min-height: 90px; resize: vertical; }
+
+        .btn-submit {
+            width: 100%; background: var(--primary); color: white; border: none; padding: 14px;
+            border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-submit:hover { background: var(--primary-hover); }
+
+        .result-box {
+            display: none; background: white; border: 2px solid #bfdbfe; border-radius: 12px;
+            padding: 32px 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+        }
+
+        .rfq-receipt {
+            border: 2px solid #0f172a; padding: 24px; border-radius: 8px; background: #fff; margin-top: 20px;
+            font-family: 'Times New Roman', Times, serif; line-height: 1.6; font-size: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-badge">SATIN ALMA & TEDARİK YÖNETİMİ</div>
+        <h1>Tedarikçi Teklif Toplama Portalı</h1>
+        <p>Şirketimizin satın alma taleplerine ve ihale süreçlerine ilişkin resmi fiyat teklifinizi aşağıdaki formu doldurarak iletebilirsiniz.</p>
+    </div>
+
+    <form id="rfqForm" onsubmit="handleRfqSubmit(event)">
+        <!-- 1. Tedarikçi Bilgileri -->
+        <div class="card">
+            <h2 class="card-title">🏢 1. Tedarikçi Firma Bilgileri</h2>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Firma Unvanınız <span class="req">*</span></label>
+                    <input type="text" id="supplierName" required placeholder="Tam ticari unvanınız">
+                </div>
+                <div class="form-group">
+                    <label>Vergi Kimlik No (VKN / TCKN) <span class="req">*</span></label>
+                    <input type="text" id="supplierVkn" required placeholder="10 haneli VKN veya 11 haneli TCKN" maxlength="11">
+                </div>
+                <div class="form-group">
+                    <label>Yetkili Adı Soyadı <span class="req">*</span></label>
+                    <input type="text" id="contactPerson" required placeholder="Satış / Teklif yetkilisi">
+                </div>
+                <div class="form-group">
+                    <label>İletişim Telefonu <span class="req">*</span></label>
+                    <input type="tel" id="supplierPhone" required placeholder="0212... veya 05XX...">
+                </div>
+                <div class="form-group">
+                    <label>E-Posta Adresi <span class="req">*</span></label>
+                    <input type="email" id="supplierEmail" required placeholder="teklif@tedarikci.com">
+                </div>
+                <div class="form-group full">
+                    <label>Şehir / Adres</label>
+                    <input type="text" id="supplierCity" placeholder="Şehir / İlçe">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Teklif Kapsamı ve Ticari Şartlar -->
+        <div class="card">
+            <h2 class="card-title">💰 2. Teklif Kapsamı ve Ticari Koşullar</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Tedarik / Hizmet Kategorisi <span class="req">*</span></label>
+                    <select id="rfqCategory" required>
+                        <option value="Hammadde & Yarı Mamul">Hammadde & Yarı Mamul</option>
+                        <option value="Bilişim, Donanım & Yazılım">Bilişim, Donanım & Yazılım</option>
+                        <option value="Ofis Malzemeleri & Kırtasiye">Ofis Malzemeleri & Kırtasiye</option>
+                        <option value="Lojistik, Taşımacılık & Kargo">Lojistik, Taşımacılık & Kargo</option>
+                        <option value="Teknik Bakım & Tesis Hizmetleri">Teknik Bakım & Tesis Hizmetleri</option>
+                        <option value="Danışmanlık & Eğitim">Danışmanlık & Profesyonel Hizmetler</option>
+                        <option value="Diğer">Diğer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>İlgili Talep / Şartname Referansı</label>
+                    <input type="text" id="rfqRef" placeholder="Örn: RFQ-2026-05 veya Genel Teklif">
+                </div>
+                <div class="form-group">
+                    <label>Teklif Edilen Toplam Tutar (KDV Hariç) <span class="req">*</span></label>
+                    <input type="number" step="0.01" id="totalAmount" required placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>Para Birimi <span class="req">*</span></label>
+                    <select id="currency" required>
+                        <option value="TRY (₺)">TRY (Türk Lirası)</option>
+                        <option value="USD ($)">USD (Amerikan Doları)</option>
+                        <option value="EUR (€)">EUR (Euro)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ödeme Vadesi <span class="req">*</span></label>
+                    <select id="paymentTerms" required>
+                        <option value="Peşin (Fatura Karşılığı)">Peşin (Fatura Karşılığı Havale)</option>
+                        <option value="30 Gün Vadeli">30 Gün Vadeli</option>
+                        <option value="60 Gün Vadeli">60 Gün Vadeli</option>
+                        <option value="90 Gün Vadeli">90 Gün Vadeli</option>
+                        <option value="Kısmi Avans + Teslimde Kalan">Kısmi Avans + Teslimde Kalan</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Teslimat Süresi (İş Günü) <span class="req">*</span></label>
+                    <input type="number" id="deliveryDays" required placeholder="Örn: 7 gün">
+                </div>
+                <div class="form-group">
+                    <label>Teklif Geçerlilik Tarihi (Opsiyon) <span class="req">*</span></label>
+                    <input type="date" id="validityDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Nakliye / Teslim Şekli</label>
+                    <select id="shippingTerms">
+                        <option value="Satıcı Tarafından Adrese Teslim (DDP)">Satıcı Tarafından Adrese Teslim (DDP)</option>
+                        <option value="Alıcı Tarafından Karşılanacak (Ex-Works)">Alıcı Tarafından Karşılanacak (Fabrika Teslim)</option>
+                        <option value="Kargo Alıcı Ödemeli">Kargo Alıcı Ödemeli</option>
+                    </select>
+                </div>
+                <div class="form-group full">
+                    <label>Teklif Açıklaması, Marka / Model ve Kalem Detayları <span class="req">*</span></label>
+                    <textarea id="quoteDetails" required placeholder="Birim fiyatlar, teklif edilen marka/kalite standartları, garanti süreleri ve teknik şartnameye uygunluk notlarınız..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+            <span>📨 Fiyat Teklifini Satın Alma Birimine Gönder</span>
+        </button>
+    </form>
+
+    <!-- Success View -->
+    <div class="result-box" id="resultBox">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 2.8rem; margin-bottom: 8px;">🤝</div>
+            <h2 style="color: var(--secondary);">Fiyat Teklifiniz Alındı</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                Teklifiniz satın alma komisyonumuzun inceleme havuzuna kaydedilmiştir.
+            </p>
+            <div style="margin: 14px 0; font-size: 1.4rem; font-weight: 800; color: var(--primary);" id="trackingCodeDisplay">TEKLIF-2026-0000</div>
+        </div>
+
+        <div class="rfq-receipt" id="printReceipt">
+            <div style="text-align:center; font-weight:bold; font-size: 1.2rem; margin-bottom: 16px; text-decoration: underline;">
+                RESMİ SATIN ALMA TEKLİF VE İHALE KATILIM FORMU
+            </div>
+            <p><b>Teklif Takip No:</b> <span id="prCode"></span></p>
+            <p><b>Tedarikçi:</b> <span id="prSupName"></span> (VKN: <span id="prSupVkn"></span>)</p>
+            <p><b>Yetkili & İletişim:</b> <span id="prContact"></span> | <span id="prPhone"></span> | <span id="prEmail"></span></p>
+            <br>
+            <p><b>Kategori / Referans:</b> <span id="prCat"></span> (<span id="prRef"></span>)</p>
+            <p><b>Teklif Tutarı:</b> <span id="prAmount"></span> <span id="prCurr"></span> (KDV Hariç)</p>
+            <p><b>Ödeme Şartı:</b> <span id="prTerms"></span></p>
+            <p><b>Teslimat Süresi:</b> <span id="prDelivery"></span> İş Günü</p>
+            <p><b>Opsiyon / Geçerlilik:</b> <span id="prValidity"></span> Tarihine Kadar</p>
+            <p><b>Teslim Şekli:</b> <span id="prShipping"></span></p>
+            <br>
+            <p><b>Ayrıntılı Şartlar ve Kalem Açıklamaları:</b></p>
+            <p style="text-indent: 20px; margin-top: 6px;" id="prDetails"></p>
+            <br>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 24px;">
+                <div><b>Tarih:</b> <span id="prDate"></span></div>
+                <div style="text-align: right;">
+                    <b>Tedarikçi Firma Yetkilisi</b><br>
+                    <span id="prSigner"></span><br>
+                    İmza / E-İmza
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 24px; display: flex; justify-content: center; gap: 12px;">
+            <button class="btn-submit" style="width: auto; padding: 10px 22px; background: #0f172a;" onclick="window.print()">🖨️ Teklif Formunu Yazdır / PDF</button>
+            <button class="btn-submit" style="width: auto; padding: 10px 22px; background: #e2e8f0; color: #334155;" onclick="location.reload()">➕ Yeni Teklif Ver</button>
+        </div>
+    </div>
+</div>
+
+<script>
+async function handleRfqSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerText = '⏳ İletiliyor...';
+
+    const payload = {
+        supplier_name: document.getElementById('supplierName').value.trim(),
+        supplier_vkn: document.getElementById('supplierVkn').value.trim(),
+        contact_person: document.getElementById('contactPerson').value.trim(),
+        supplier_phone: document.getElementById('supplierPhone').value.trim(),
+        supplier_email: document.getElementById('supplierEmail').value.trim(),
+        supplier_city: document.getElementById('supplierCity').value.trim(),
+        rfq_category: document.getElementById('rfqCategory').value,
+        rfq_ref: document.getElementById('rfqRef').value.trim() || 'Genel Teklif',
+        total_amount: parseFloat(document.getElementById('totalAmount').value) || 0,
+        currency: document.getElementById('currency').value,
+        payment_terms: document.getElementById('paymentTerms').value,
+        delivery_days: parseInt(document.getElementById('deliveryDays').value) || 1,
+        validity_date: document.getElementById('validityDate').value,
+        shipping_terms: document.getElementById('shippingTerms').value,
+        quote_details: document.getElementById('quoteDetails').value.trim(),
+        status: 'Teklif Alındı',
+        created_at: new Date().toISOString()
+    };
+
+    let trackingCode = 'TEKLIF-2026-' + Math.floor(1000 + Math.random() * 9000);
+
+    try {
+        const res = await fetch('/api/teklif-ver', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.tracking_code) trackingCode = data.tracking_code;
+        }
+    } catch (err) {
+        const local = JSON.parse(localStorage.getItem('tedarikci_teklifler') || '[]');
+        payload.tracking_code = trackingCode;
+        local.push(payload);
+        localStorage.setItem('tedarikci_teklifler', JSON.stringify(local));
+    }
+
+    document.getElementById('rfqForm').style.display = 'none';
+    document.getElementById('resultBox').style.display = 'block';
+    document.getElementById('trackingCodeDisplay').innerText = trackingCode;
+
+    // Fill Receipt
+    document.getElementById('prCode').innerText = trackingCode;
+    document.getElementById('prSupName').innerText = payload.supplier_name;
+    document.getElementById('prSupVkn').innerText = payload.supplier_vkn;
+    document.getElementById('prContact').innerText = payload.contact_person;
+    document.getElementById('prPhone').innerText = payload.supplier_phone;
+    document.getElementById('prEmail').innerText = payload.supplier_email;
+    document.getElementById('prCat').innerText = payload.rfq_category;
+    document.getElementById('prRef').innerText = payload.rfq_ref;
+    document.getElementById('prAmount').innerText = payload.total_amount.toLocaleString('tr-TR', {minimumFractionDigits:2});
+    document.getElementById('prCurr').innerText = payload.currency;
+    document.getElementById('prTerms').innerText = payload.payment_terms;
+    document.getElementById('prDelivery').innerText = payload.delivery_days;
+    document.getElementById('prValidity').innerText = payload.validity_date;
+    document.getElementById('prShipping').innerText = payload.shipping_terms;
+    document.getElementById('prDetails').innerText = payload.quote_details;
+    document.getElementById('prDate').innerText = new Date().toLocaleDateString('tr-TR');
+    document.getElementById('prSigner').innerText = payload.contact_person;
+}
+</script>
+
+</body>
+</html>
