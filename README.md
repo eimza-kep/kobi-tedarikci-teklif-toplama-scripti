@@ -76,6 +76,18 @@ python scripts/test_teklif.py
 
 ---
 
+## 🌐 KOBİ & E-Dönüşüm Açık Kaynak Ekosistemi
+
+Bu satın alma ve tedarikçi teklif toplama aracı, [@eimza-kep](https://github.com/eimza-kep) açık kaynak ekosisteminin B2B tedarik yönetimi bileşenidir. İlgili diğer araçlar:
+
+* 💼 [kobi-hizli-teklif-scripti](https://github.com/eimza-kep/kobi-hizli-teklif-scripti) - Kendi müşterilerinize yönelik hızlı satış teklifi hazırlama motoru.
+* 🏢 [kobi-finans-yonetim-excel-sablonlari](https://github.com/eimza-kep/kobi-finans-yonetim-excel-sablonlari) - Satın alma bütçesi, nakit akışı ve stok takip şablonları.
+* 📄 [e-fatura-xml-goruntuleyici](https://github.com/eimza-kep/e-fatura-xml-goruntuleyici) - Tedarikçilerden gelen e-Fatura XML dosyalarını görüntüleme ve KDV kontrolü.
+* 🌟 [awesome-turkiye-e-donusum](https://github.com/eimza-kep/awesome-turkiye-e-donusum) - Türkiye e-Dönüşüm açık kaynak araçları ve kütüphaneleri kürasyonu.
+
+---
+
 ## ⚖️ Lisans
 
 Bu proje [MIT Lisansı](LICENSE) kapsamında açık kaynak olarak sunulmuştur.
+
