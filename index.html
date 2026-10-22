@@ -111,6 +111,10 @@
                     <label>E-Posta Adresi <span class="req">*</span></label>
                     <input type="email" id="supplierEmail" required placeholder="teklif@tedarikci.com">
                 </div>
+                <div class="form-group">
+                    <label>Tedarikçi KEP Adresi (Sözleşme & KEP Bildirimi İçin)</label>
+                    <input type="text" id="supplierKep" placeholder="ornekfirma@hs01.kep.tr">
+                </div>
                 <div class="form-group full">
                     <label>Şehir / Adres</label>
                     <input type="text" id="supplierCity" placeholder="Şehir / İlçe">
@@ -247,6 +251,7 @@ async function handleRfqSubmit(e) {
         contact_person: document.getElementById('contactPerson').value.trim(),
         supplier_phone: document.getElementById('supplierPhone').value.trim(),
         supplier_email: document.getElementById('supplierEmail').value.trim(),
+        supplier_kep: (document.getElementById('supplierKep') ? document.getElementById('supplierKep').value.trim() : ''),
         supplier_city: document.getElementById('supplierCity').value.trim(),
         rfq_category: document.getElementById('rfqCategory').value,
         rfq_ref: document.getElementById('rfqRef').value.trim() || 'Genel Teklif',

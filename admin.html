@@ -13,16 +13,21 @@
             --border: #e2e8f0;
             --text-main: #1e293b;
             --text-muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background: var(--bg); color: var(--text-main); line-height: 1.5; padding: 24px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .navbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 18px 24px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+        .container { max-width: 1280px; margin: 0 auto; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 18px 24px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 12px; }
         .navbar h1 { font-size: 1.3rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-        .nav-actions { display: flex; gap: 10px; }
-        .btn { padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: white; color: var(--text-main); transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .nav-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: white; color: var(--text-main); transition: 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .btn:hover { background: #f1f5f9; }
         .btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
         .btn-primary:hover { background: var(--primary-hover); }
+        .btn-success { background: var(--success); color: white; border-color: var(--success); }
+        .btn-success:hover { background: #059669; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
         .stat-card { background: white; padding: 18px; border-radius: 10px; border: 1px solid var(--border); }
@@ -35,8 +40,8 @@
 
         .table-container { background: white; border-radius: 10px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
-        th { background: #f8fafc; padding: 12px 16px; font-weight: 700; color: #475569; border-bottom: 1px solid var(--border); white-space: nowrap; }
-        td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        th { background: #f8fafc; padding: 12px 14px; font-weight: 700; color: #475569; border-bottom: 1px solid var(--border); white-space: nowrap; }
+        td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
         tr:hover { background: #f1f5f9; }
 
         .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
@@ -44,23 +49,31 @@
         .badge-review { background: #fef3c7; color: #b45309; }
         .badge-accepted { background: #dcfce7; color: #15803d; }
         .badge-rejected { background: #fee2e2; color: #b91c1c; }
+        .badge-best { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 800; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 20px; z-index: 50; }
-        .modal-card { background: white; width: 100%; max-width: 650px; border-radius: 12px; padding: 24px; max-height: 90vh; overflow-y: auto; }
+        .modal-card { background: white; width: 100%; max-width: 760px; border-radius: 12px; padding: 24px; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
-        .detail-row { display: flex; margin-bottom: 10px; font-size: 0.88rem; }
-        .detail-lbl { width: 160px; font-weight: 600; color: var(--text-muted); }
+        .detail-row { display: flex; margin-bottom: 8px; font-size: 0.88rem; }
+        .detail-lbl { width: 180px; font-weight: 600; color: var(--text-muted); }
         .detail-val { flex: 1; color: var(--text-main); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group.full { grid-column: span 2; }
+        .form-group label { font-size: 0.8rem; font-weight: 600; color: #334155; }
+        .form-group input { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; outline: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="navbar">
-        <h1>📊 Satın Alma & Tedarikçi Teklif Takip Paneli</h1>
+        <h1>📊 Satın Alma, Tedarikçi Karşılaştırma & KEP Portalı</h1>
         <div class="nav-actions">
+            <button class="btn btn-primary" onclick="openMatrixModal()">📊 Karşılaştırma Matrisi</button>
+            <button class="btn" onclick="openSettingsModal()">⚙️ Alıcı & KEP Ayarları</button>
             <a href="/" class="btn" target="_blank">🌐 Teklif Formu</a>
-            <button class="btn btn-primary" onclick="exportCSV()">📥 CSV Dışa Aktar</button>
+            <button class="btn" onclick="exportCSV()">📥 CSV Dışa Aktar</button>
             <button class="btn" onclick="fetchData()">🔄 Yenile</button>
         </div>
     </div>
@@ -100,6 +113,7 @@
             <option value="Teknik İncelemede">Teknik İncelemede</option>
             <option value="Pazarlık / Revize İstendi">Pazarlık / Revize</option>
             <option value="Kabul Edildi (Sipariş Verildi)">Kabul Edildi</option>
+            <option value="Kabul Edildi (KEP ile Tebliğ Edildi)">KEP ile Tebliğ Edildi</option>
             <option value="Reddedildi">Reddedildi</option>
         </select>
     </div>
@@ -110,13 +124,13 @@
                 <tr>
                     <th>Teklif No</th>
                     <th>Tedarikçi Firma</th>
-                    <th>Kategori</th>
+                    <th>Kategori / Ref</th>
                     <th>Tutar</th>
                     <th>Vade</th>
                     <th>Teslimat</th>
-                    <th>Geçerlilik</th>
+                    <th>KEP</th>
                     <th>Durum</th>
-                    <th>İşlem</th>
+                    <th>İşlemler</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -126,15 +140,28 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal 1: Teklif Detay ve KEP Onay -->
 <div class="modal" id="detailModal">
     <div class="modal-card">
         <div class="modal-header">
-            <h3 id="modalTitle">Teklif Detayı</h3>
+            <h3 id="modalTitle">Teklif Detayı & Resmi Sözleşme</h3>
             <button onclick="closeModal()" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
         </div>
         <div id="modalBody"></div>
-        <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 14px;">
+
+        <!-- KEP ve Sözleşme İş Akışı -->
+        <div style="margin-top: 16px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px; border-radius: 8px;">
+            <div style="font-weight: 700; color: #166534; font-size: 0.9rem; margin-bottom: 6px;">📬 KEP (Kayıtlı Elektronik Posta) ve Resmi Sözleşme Entegrasyonu:</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px;">
+                <input type="text" id="modalSupplierKep" placeholder="tedarikci@hs01.kep.tr" style="flex:1; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem;">
+                <button class="btn btn-success" onclick="sendKepOrder()">📬 KEP ile Resmi Tebliğ Et</button>
+                <button class="btn btn-primary" onclick="openContractPage()">📄 Sözleşme A4</button>
+                <button class="btn" onclick="openEmailModal()">✉️ E-Posta Şablonu</button>
+            </div>
+            <small style="color: #15803d;">TTK m. 18/3 uyarınca KEP üzerinden tebliğ edilen siparişler kesinleşmiş hukuki delil niteliği taşır.</small>
+        </div>
+
+        <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 14px; flex-wrap: wrap; gap: 8px;">
             <div style="display: flex; gap: 8px; align-items: center;">
                 <label style="font-size: 0.85rem; font-weight: 600;">Durum:</label>
                 <select id="changeStatusSelect" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); font-size: 0.85rem;">
@@ -142,11 +169,129 @@
                     <option value="Teknik İncelemede">Teknik İncelemede</option>
                     <option value="Pazarlık / Revize İstendi">Pazarlık / Revize İstendi</option>
                     <option value="Kabul Edildi (Sipariş Verildi)">Kabul Edildi (Sipariş Verildi)</option>
+                    <option value="Kabul Edildi (KEP ile Tebliğ Edildi)">Kabul Edildi (KEP ile Tebliğ Edildi)</option>
                     <option value="Reddedildi">Reddedildi</option>
                 </select>
                 <button class="btn btn-primary" onclick="updateCurrentStatus()">Kaydet</button>
             </div>
             <button class="btn" onclick="window.print()">🖨️ Yazdır</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 2: Tedarikçi Karşılaştırma Matrisi -->
+<div class="modal" id="matrixModal">
+    <div class="modal-card" style="max-width: 960px;">
+        <div class="modal-header">
+            <h3>📊 Tedarikçi Teklif Karşılaştırma Matrisi (En Uygun Fiyat & Vade Analizi)</h3>
+            <button onclick="closeMatrixModal()" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
+        </div>
+        <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 12px;">
+            Aynı kategori ve talep referansına sahip teklifler fiyat (%45), vade (%25), teslimat süresi (%20) ve nakliye (%10) ağırlıklarıyla puanlanmıştır.
+        </p>
+        <div style="margin-bottom: 14px; display: flex; gap: 10px; align-items: center;">
+            <label style="font-size: 0.85rem; font-weight: 600;">Referans / Talep Filtresi:</label>
+            <select id="matrixRefSelect" onchange="loadMatrix()" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem;">
+                <option value="">Tüm Teklifleri Karşılaştır</option>
+            </select>
+        </div>
+        <div class="table-container" style="max-height: 50vh; overflow-y: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tedarikçi</th>
+                        <th>Teklif Tutarı</th>
+                        <th>Vade</th>
+                        <th>Teslim Süresi</th>
+                        <th>Nakliye</th>
+                        <th>Analiz Puanı</th>
+                        <th>Durum / Rozet</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="matrixTableBody">
+                    <tr><td colspan="8" style="text-align:center; padding: 20px;">Yükleniyor...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 3: Alıcı & KEP Ayarları -->
+<div class="modal" id="settingsModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>⚙️ Satın Alma Alıcı Firma & KEP Ayarları</h3>
+            <button onclick="closeSettingsModal()" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
+        </div>
+        <form onsubmit="saveSettings(event)">
+            <div class="form-row">
+                <div class="form-group full">
+                    <label>Alıcı Şirket Unvanı</label>
+                    <input type="text" id="set_title" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>VKN</label>
+                    <input type="text" id="set_vkn" required>
+                </div>
+                <div class="form-group">
+                    <label>Vergi Dairesi</label>
+                    <input type="text" id="set_tax_office" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group full">
+                    <label>Adres</label>
+                    <input type="text" id="set_address" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Alıcı KEP Adresi</label>
+                    <input type="text" id="set_kep_address" placeholder="sirket@hs01.kep.tr" required>
+                </div>
+                <div class="form-group">
+                    <label>Satın Alma Yetkilisi</label>
+                    <input type="text" id="set_authorized_person" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Telefon</label>
+                    <input type="text" id="set_phone" required>
+                </div>
+                <div class="form-group">
+                    <label>E-Posta</label>
+                    <input type="email" id="set_email" required>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px;">
+                <button type="button" class="btn" onclick="closeSettingsModal()">Vazgeç</button>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal 4: E-Posta Şablonu -->
+<div class="modal" id="emailModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>✉️ Tedarikçiye Sipariş Onay E-Postası</h3>
+            <button onclick="closeEmailModal()" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
+        </div>
+        <div style="margin-bottom: 10px;">
+            <b>Konu:</b> <input type="text" id="emailSubject" style="width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; margin-top: 4px;">
+        </div>
+        <div>
+            <b>Mesaj Gövdesi:</b>
+            <textarea id="emailBody" style="width: 100%; height: 220px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: monospace; font-size: 0.83rem; margin-top: 4px;"></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+            <button class="btn" onclick="closeEmailModal()">Kapat</button>
+            <button class="btn btn-primary" onclick="copyEmailText()">📋 Metni Kopyala</button>
         </div>
     </div>
 </div>
@@ -158,11 +303,8 @@ let activeItem = null;
 async function fetchData() {
     try {
         const res = await fetch('/api/teklifler');
-        if (res.ok) {
-            allData = await res.json();
-        } else {
-            fallbackLocal();
-        }
+        if (res.ok) allData = await res.json();
+        else fallbackLocal();
     } catch (e) {
         fallbackLocal();
     }
@@ -209,19 +351,23 @@ function render() {
         if (st.includes('Red')) badgeClass = 'badge-rejected';
 
         const amountFormatted = (parseFloat(d.total_amount) || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 });
+        const hasKep = (d.supplier_kep && d.supplier_kep.includes('@')) ? '✅ KEP Var' : '❌ Yok';
 
         return `
             <tr>
                 <td><b>${d.tracking_code || 'TEKLIF-'+i}</b></td>
                 <td><b>${escapeHtml(d.supplier_name || '')}</b><br><small style="color:var(--text-muted)">${escapeHtml(d.contact_person || '')}</small></td>
-                <td><small>${escapeHtml(d.rfq_category || '')}</small></td>
+                <td><small>${escapeHtml(d.rfq_category || '')}<br><b>${escapeHtml(d.rfq_ref || 'Genel')}</b></small></td>
                 <td><b>${amountFormatted} ${escapeHtml(d.currency || 'TRY')}</b></td>
                 <td><small>${escapeHtml(d.payment_terms || '')}</small></td>
                 <td>${d.delivery_days || 1} Gün</td>
-                <td>${d.validity_date || '-'}</td>
+                <td><small>${hasKep}</small></td>
                 <td><span class="badge ${badgeClass}">${st}</span></td>
                 <td>
-                    <button class="btn" style="padding: 4px 8px; font-size: 0.8rem;" onclick="viewDetail(${i})">Detay</button>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.78rem;" onclick="viewDetail(${i})">Yönet</button>
+                        <a href="/api/satin-alma-sozlesmesi?tracking_code=${encodeURIComponent(d.tracking_code)}" target="_blank" class="btn" style="padding: 4px 8px; font-size: 0.78rem;">📄 Sözleşme</a>
+                    </div>
                 </td>
             </tr>
         `;
@@ -236,6 +382,7 @@ function viewDetail(idx) {
 
     document.getElementById('modalTitle').innerText = `${activeItem.tracking_code} - ${activeItem.supplier_name}`;
     document.getElementById('changeStatusSelect').value = activeItem.status || 'Teklif Alındı';
+    document.getElementById('modalSupplierKep').value = activeItem.supplier_kep || '';
 
     const b = document.getElementById('modalBody');
     b.innerHTML = `
@@ -247,9 +394,9 @@ function viewDetail(idx) {
         <div class="detail-row"><div class="detail-lbl">Teslimat Süresi:</div><div class="detail-val">${escapeHtml(activeItem.delivery_days || '')} İş Günü</div></div>
         <div class="detail-row"><div class="detail-lbl">Opsiyon Tarihi:</div><div class="detail-val">${escapeHtml(activeItem.validity_date || '')}</div></div>
         <div class="detail-row"><div class="detail-lbl">Nakliye / Teslimat:</div><div class="detail-val">${escapeHtml(activeItem.shipping_terms || '')}</div></div>
-        <div style="margin-top: 12px; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
-            <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 4px;">Ayrıntılı Şartlar ve Birim Fiyatlar:</div>
-            <div style="font-size: 0.85rem; color: #475569; white-space: pre-wrap;">${escapeHtml(activeItem.quote_details || '')}</div>
+        <div style="margin-top: 10px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
+            <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 2px;">Teklif Detayları:</div>
+            <div style="font-size: 0.83rem; color: #475569; white-space: pre-wrap;">${escapeHtml(activeItem.quote_details || '')}</div>
         </div>
     `;
 
@@ -257,6 +404,169 @@ function viewDetail(idx) {
 }
 
 function closeModal() { document.getElementById('detailModal').style.display = 'none'; }
+
+function openContractPage() {
+    if (!activeItem) return;
+    window.open(`/api/satin-alma-sozlesmesi?tracking_code=${encodeURIComponent(activeItem.tracking_code)}`, '_blank');
+}
+
+async function sendKepOrder() {
+    if (!activeItem) return;
+    const kep = document.getElementById('modalSupplierKep').value.trim();
+    if (!kep || !kep.includes('@')) {
+        alert("Lütfen tedarikçinin geçerli bir KEP adresini (örn: firma@hs01.kep.tr) giriniz.");
+        return;
+    }
+
+    if (!confirm(`Sipariş sözleşmesi ${kep} adresine resmi KEP tebligatı olarak gönderilsin mi?`)) return;
+
+    try {
+        const res = await fetch('/api/kep-gonder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tracking_code: activeItem.tracking_code, supplier_kep: kep })
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+            const pkg = data.package;
+            alert(`✅ KEP TEBLİGATI OLUŞTURULDU!\n\nDelil / Mazbata Barkodu: ${pkg.mazbata_code}\nMesaj ID: ${pkg.message_id}\nAlıcı KEP: ${pkg.recipient_kep}\n\nSipariş durumu KEP Onaylı olarak güncellendi.`);
+            activeItem.status = 'Kabul Edildi (KEP ile Tebliğ Edildi)';
+            activeItem.supplier_kep = kep;
+            render();
+            closeModal();
+        } else {
+            alert('KEP iletiminde hata: ' + (data.message || 'Bilinmeyen hata'));
+        }
+    } catch (e) {
+        alert('Sunucu iletişim hatası.');
+    }
+}
+
+async function openEmailModal() {
+    if (!activeItem) return;
+    try {
+        const res = await fetch(`/api/kabul-eposta?tracking_code=${encodeURIComponent(activeItem.tracking_code)}`);
+        if (res.ok) {
+            const data = await res.json();
+            document.getElementById('emailSubject').value = data.subject || '';
+            document.getElementById('emailBody').value = data.body || '';
+            document.getElementById('emailModal').style.display = 'flex';
+        }
+    } catch (e) {
+        alert("E-posta şablonu yüklenemedi.");
+    }
+}
+
+function closeEmailModal() { document.getElementById('emailModal').style.display = 'none'; }
+
+function copyEmailText() {
+    const text = document.getElementById('emailBody').value;
+    navigator.clipboard.writeText(text);
+    alert("✅ E-posta metni panoya kopyalandı!");
+}
+
+async function openMatrixModal() {
+    document.getElementById('matrixModal').style.display = 'flex';
+    // populate select
+    const sel = document.getElementById('matrixRefSelect');
+    sel.innerHTML = '<option value="">Tüm Teklifleri Karşılaştır</option>';
+    const refs = [...new Set(allData.map(d => d.rfq_ref).filter(Boolean))];
+    refs.forEach(r => {
+        sel.innerHTML += `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`;
+    });
+    loadMatrix();
+}
+
+function closeMatrixModal() { document.getElementById('matrixModal').style.display = 'none'; }
+
+async function loadMatrix() {
+    const ref = document.getElementById('matrixRefSelect').value;
+    const tbody = document.getElementById('matrixTableBody');
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;">Analiz yapılıyor...</td></tr>';
+
+    try {
+        const res = await fetch(`/api/karsilastirma-matrisi?rfq_ref=${encodeURIComponent(ref)}`);
+        const json = await res.json();
+        const list = json.matrix || [];
+
+        if (list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color:#64748b;">Karşılaştırılacak teklif bulunamadı.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = list.map(q => {
+            let badges = [];
+            if (q.is_best_value) badges.push('<span class="badge badge-best">🏆 EN AVANTAJLI</span>');
+            if (q.is_lowest_price) badges.push('<span class="badge" style="background:#e0f2fe; color:#0369a1;">🏷️ En Düşük Fiyat</span>');
+            if (q.is_fastest_delivery) badges.push('<span class="badge" style="background:#fef3c7; color:#b45309;">⚡ En Hızlı</span>');
+
+            return `
+                <tr style="${q.is_best_value ? 'background: #f0fdf4; font-weight:600;' : ''}">
+                    <td><b>${escapeHtml(q.supplier_name)}</b><br><small style="color:#64748b;">${escapeHtml(q.tracking_code)}</small></td>
+                    <td><b>${Number(q.total_amount).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ${escapeHtml(q.currency)}</b></td>
+                    <td><small>${escapeHtml(q.payment_terms)}</small></td>
+                    <td>${q.delivery_days} İş Günü</td>
+                    <td><small>${escapeHtml(q.shipping_terms || 'DDP')}</small></td>
+                    <td><span style="font-size:1.1rem; color:#2563eb; font-weight:800;">${q.score}</span> / 100</td>
+                    <td>${badges.join(' ')}</td>
+                    <td>
+                        <a href="/api/satin-alma-sozlesmesi?tracking_code=${encodeURIComponent(q.tracking_code)}" target="_blank" class="btn btn-primary" style="padding: 4px 8px; font-size: 0.78rem;">Sözleşme</a>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color:#dc2626;">Matris hesaplanırken hata oluştu.</td></tr>';
+    }
+}
+
+async function openSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'flex';
+    try {
+        const res = await fetch('/api/ayarlar');
+        if (res.ok) {
+            const data = await res.json();
+            document.getElementById('set_title').value = data.title || '';
+            document.getElementById('set_vkn').value = data.vkn || '';
+            document.getElementById('set_tax_office').value = data.tax_office || '';
+            document.getElementById('set_address').value = data.address || '';
+            document.getElementById('set_kep_address').value = data.kep_address || '';
+            document.getElementById('set_authorized_person').value = data.authorized_person || '';
+            document.getElementById('set_phone').value = data.phone || '';
+            document.getElementById('set_email').value = data.email || '';
+        }
+    } catch (e) {}
+}
+
+function closeSettingsModal() { document.getElementById('settingsModal').style.display = 'none'; }
+
+async function saveSettings(e) {
+    e.preventDefault();
+    const payload = {
+        title: document.getElementById('set_title').value.trim(),
+        vkn: document.getElementById('set_vkn').value.trim(),
+        tax_office: document.getElementById('set_tax_office').value.trim(),
+        address: document.getElementById('set_address').value.trim(),
+        kep_address: document.getElementById('set_kep_address').value.trim(),
+        authorized_person: document.getElementById('set_authorized_person').value.trim(),
+        phone: document.getElementById('set_phone').value.trim(),
+        email: document.getElementById('set_email').value.trim()
+    };
+
+    try {
+        const res = await fetch('/api/ayarlar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+            alert("✅ Alıcı ve KEP ayarları kaydedildi.");
+            closeSettingsModal();
+        }
+    } catch (e) {
+        alert("Ayar kaydedilemedi.");
+    }
+}
 
 async function updateCurrentStatus() {
     if (!activeItem) return;
@@ -278,9 +588,9 @@ async function updateCurrentStatus() {
 
 function exportCSV() {
     if (!allData || allData.length === 0) { alert('Dışa aktarılacak teklif verisi bulunamadı.'); return; }
-    let csv = '\uFEFFTeklif No,Tedarikçi,VKN,Yetkili,Telefon,E-posta,Kategori,Tutar,Para Birimi,Vade,Teslimat Gün,Geçerlilik,Durum\n';
+    let csv = '\uFEFFTeklif No,Tedarikçi,VKN,Yetkili,Telefon,E-posta,KEP,Kategori,Tutar,Para Birimi,Vade,Teslimat Gün,Geçerlilik,Durum\n';
     allData.forEach(d => {
-        csv += `"${d.tracking_code || ''}","${d.supplier_name || ''}","${d.supplier_vkn || ''}","${d.contact_person || ''}","${d.supplier_phone || ''}","${d.supplier_email || ''}","${d.rfq_category || ''}","${d.total_amount || 0}","${d.currency || 'TRY'}","${d.payment_terms || ''}","${d.delivery_days || 1}","${d.validity_date || ''}","${d.status || 'Teklif Alındı'}"\n`;
+        csv += `"${d.tracking_code || ''}","${d.supplier_name || ''}","${d.supplier_vkn || ''}","${d.contact_person || ''}","${d.supplier_phone || ''}","${d.supplier_email || ''}","${d.supplier_kep || ''}","${d.rfq_category || ''}","${d.total_amount || 0}","${d.currency || 'TRY'}","${d.payment_terms || ''}","${d.delivery_days || 1}","${d.validity_date || ''}","${d.status || 'Teklif Alındı'}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
