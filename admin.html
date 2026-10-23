@@ -52,7 +52,7 @@
         .badge-best { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; font-weight: 800; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; padding: 20px; z-index: 50; }
-        .modal-card { background: white; width: 100%; max-width: 760px; border-radius: 12px; padding: 24px; max-height: 90vh; overflow-y: auto; }
+        .modal-card { background: white; width: 100%; max-width: 800px; border-radius: 12px; padding: 24px; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
         .detail-row { display: flex; margin-bottom: 8px; font-size: 0.88rem; }
         .detail-lbl { width: 180px; font-weight: 600; color: var(--text-muted); }
@@ -71,6 +71,7 @@
         <h1>📊 Satın Alma, Tedarikçi Karşılaştırma & KEP Portalı</h1>
         <div class="nav-actions">
             <button class="btn btn-primary" onclick="openMatrixModal()">📊 Karşılaştırma Matrisi</button>
+            <a href="/api/karsilastirma-raporu-html" target="_blank" class="btn" style="background: #0f172a; color: white;">📑 A4 Karşılaştırma Raporu</a>
             <button class="btn" onclick="openSettingsModal()">⚙️ Alıcı & KEP Ayarları</button>
             <a href="/" class="btn" target="_blank">🌐 Teklif Formu</a>
             <button class="btn" onclick="exportCSV()">📥 CSV Dışa Aktar</button>
@@ -140,7 +141,7 @@
     </div>
 </div>
 
-<!-- Modal 1: Teklif Detay ve KEP Onay -->
+<!-- Modal 1: Teklif Detay, KEP Onay ve UBL-TR Sipariş XML -->
 <div class="modal" id="detailModal">
     <div class="modal-card">
         <div class="modal-header">
@@ -149,16 +150,17 @@
         </div>
         <div id="modalBody"></div>
 
-        <!-- KEP ve Sözleşme İş Akışı -->
+        <!-- UBL-TR 2.1 ve KEP İş Akışı -->
         <div style="margin-top: 16px; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px; border-radius: 8px;">
             <div style="font-weight: 700; color: #166534; font-size: 0.9rem; margin-bottom: 6px;">📬 KEP (Kayıtlı Elektronik Posta) ve Resmi Sözleşme Entegrasyonu:</div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px;">
                 <input type="text" id="modalSupplierKep" placeholder="tedarikci@hs01.kep.tr" style="flex:1; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem;">
                 <button class="btn btn-success" onclick="sendKepOrder()">📬 KEP ile Resmi Tebliğ Et</button>
                 <button class="btn btn-primary" onclick="openContractPage()">📄 Sözleşme A4</button>
+                <a id="modalExportUblBtn" href="#" target="_blank" class="btn" style="background:#0284c7; color:white;">📥 UBL-TR Sipariş XML</a>
                 <button class="btn" onclick="openEmailModal()">✉️ E-Posta Şablonu</button>
             </div>
-            <small style="color: #15803d;">TTK m. 18/3 uyarınca KEP üzerinden tebliğ edilen siparişler kesinleşmiş hukuki delil niteliği taşır.</small>
+            <small style="color: #15803d;">TTK m. 18/3 uyarınca KEP üzerinden tebliğ edilen siparişler kesinleşmiş hukuki delil niteliği taşır. GİB UBL-TR 2.1 Sipariş XML'i muhasebe/ERP aktarımına uygundur.</small>
         </div>
 
         <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 14px; flex-wrap: wrap; gap: 8px;">
@@ -181,19 +183,25 @@
 
 <!-- Modal 2: Tedarikçi Karşılaştırma Matrisi -->
 <div class="modal" id="matrixModal">
-    <div class="modal-card" style="max-width: 960px;">
+    <div class="modal-card" style="max-width: 1020px;">
         <div class="modal-header">
             <h3>📊 Tedarikçi Teklif Karşılaştırma Matrisi (En Uygun Fiyat & Vade Analizi)</h3>
             <button onclick="closeMatrixModal()" style="border:none; background:none; font-size: 1.2rem; cursor:pointer;">✖</button>
         </div>
         <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 12px;">
-            Aynı kategori ve talep referansına sahip teklifler fiyat (%45), vade (%25), teslimat süresi (%20) ve nakliye (%10) ağırlıklarıyla puanlanmıştır.
+            Aynı kategori ve talep referansına sahip teklifler net fiyat (%45), vade (%25), teslimat süresi (%20), iskonto ve nakliye (%10) ağırlıklarıyla puanlanmıştır.
         </p>
-        <div style="margin-bottom: 14px; display: flex; gap: 10px; align-items: center;">
-            <label style="font-size: 0.85rem; font-weight: 600;">Referans / Talep Filtresi:</label>
-            <select id="matrixRefSelect" onchange="loadMatrix()" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem;">
-                <option value="">Tüm Teklifleri Karşılaştır</option>
-            </select>
+        <div style="margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <label style="font-size: 0.85rem; font-weight: 600;">Referans / Talep Filtresi:</label>
+                <select id="matrixRefSelect" onchange="loadMatrix()" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.85rem;">
+                    <option value="">Tüm Teklifleri Karşılaştır</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <a id="matrixPrintableReportBtn" href="/api/karsilastirma-raporu-html" target="_blank" class="btn btn-primary" style="font-size: 0.8rem;">🖨️ A4 Karşılaştırma Raporu (PDF)</a>
+                <a id="matrixCsvReportBtn" href="/api/karsilastirma-raporu-csv" target="_blank" class="btn btn-success" style="font-size: 0.8rem;">📥 Excel CSV İndir</a>
+            </div>
         </div>
         <div class="table-container" style="max-height: 50vh; overflow-y: auto;">
             <table>
@@ -201,16 +209,17 @@
                     <tr>
                         <th>Tedarikçi</th>
                         <th>Teklif Tutarı</th>
+                        <th>İskonto</th>
                         <th>Vade</th>
                         <th>Teslim Süresi</th>
                         <th>Nakliye</th>
                         <th>Analiz Puanı</th>
-                        <th>Durum / Rozet</th>
-                        <th>İşlem</th>
+                        <th>Rozetler</th>
+                        <th>İşlemler</th>
                     </tr>
                 </thead>
                 <tbody id="matrixTableBody">
-                    <tr><td colspan="8" style="text-align:center; padding: 20px;">Yükleniyor...</td></tr>
+                    <tr><td colspan="9" style="text-align:center; padding: 20px;">Yükleniyor...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -367,6 +376,7 @@ function render() {
                     <div style="display: flex; gap: 4px; flex-wrap: wrap;">
                         <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.78rem;" onclick="viewDetail(${i})">Yönet</button>
                         <a href="/api/satin-alma-sozlesmesi?tracking_code=${encodeURIComponent(d.tracking_code)}" target="_blank" class="btn" style="padding: 4px 8px; font-size: 0.78rem;">📄 Sözleşme</a>
+                        <a href="/api/export-order-xml?tracking_code=${encodeURIComponent(d.tracking_code)}" target="_blank" class="btn" style="padding: 4px 8px; font-size: 0.78rem; background: #f0f9ff; color: #0284c7; border-color: #bae6fd;">📥 XML</a>
                     </div>
                 </td>
             </tr>
@@ -383,13 +393,21 @@ function viewDetail(idx) {
     document.getElementById('modalTitle').innerText = `${activeItem.tracking_code} - ${activeItem.supplier_name}`;
     document.getElementById('changeStatusSelect').value = activeItem.status || 'Teklif Alındı';
     document.getElementById('modalSupplierKep').value = activeItem.supplier_kep || '';
+    document.getElementById('modalExportUblBtn').href = `/api/export-order-xml?tracking_code=${encodeURIComponent(activeItem.tracking_code)}`;
+
+    const gross = parseFloat(activeItem.total_amount) || 0;
+    const disc = parseFloat(activeItem.discount_amount) || 0;
+    const net = Math.max(0, gross - disc);
+    const curr = escapeHtml(activeItem.currency || 'TRY');
 
     const b = document.getElementById('modalBody');
     b.innerHTML = `
         <div class="detail-row"><div class="detail-lbl">Tedarikçi:</div><div class="detail-val"><b>${escapeHtml(activeItem.supplier_name || '')}</b> (VKN: ${escapeHtml(activeItem.supplier_vkn || '')})</div></div>
         <div class="detail-row"><div class="detail-lbl">Yetkili / İletişim:</div><div class="detail-val">${escapeHtml(activeItem.contact_person || '')} | ${escapeHtml(activeItem.supplier_phone || '')} | ${escapeHtml(activeItem.supplier_email || '')}</div></div>
         <div class="detail-row"><div class="detail-lbl">Kategori / Referans:</div><div class="detail-val">${escapeHtml(activeItem.rfq_category || '')} (${escapeHtml(activeItem.rfq_ref || '')})</div></div>
-        <div class="detail-row"><div class="detail-lbl">Teklif Tutarı:</div><div class="detail-val"><b>${(parseFloat(activeItem.total_amount)||0).toLocaleString('tr-TR', {minimumFractionDigits:2})} ${escapeHtml(activeItem.currency || 'TRY')}</b> + KDV</div></div>
+        <div class="detail-row"><div class="detail-lbl">Brüt Teklif Tutarı:</div><div class="detail-val"><b>${gross.toLocaleString('tr-TR', {minimumFractionDigits:2})} ${curr}</b></div></div>
+        ${disc > 0 ? `<div class="detail-row"><div class="detail-lbl">İskonto / İndirim:</div><div class="detail-val" style="color:#dc2626;">-${disc.toLocaleString('tr-TR', {minimumFractionDigits:2})} ${curr}</div></div>
+        <div class="detail-row"><div class="detail-lbl">Net Tutar (KDV Hariç):</div><div class="detail-val" style="color:#0284c7; font-weight:bold;">${net.toLocaleString('tr-TR', {minimumFractionDigits:2})} ${curr}</div></div>` : ''}
         <div class="detail-row"><div class="detail-lbl">Ödeme Vadesi:</div><div class="detail-val">${escapeHtml(activeItem.payment_terms || '')}</div></div>
         <div class="detail-row"><div class="detail-lbl">Teslimat Süresi:</div><div class="detail-val">${escapeHtml(activeItem.delivery_days || '')} İş Günü</div></div>
         <div class="detail-row"><div class="detail-lbl">Opsiyon Tarihi:</div><div class="detail-val">${escapeHtml(activeItem.validity_date || '')}</div></div>
@@ -481,8 +499,13 @@ function closeMatrixModal() { document.getElementById('matrixModal').style.displ
 
 async function loadMatrix() {
     const ref = document.getElementById('matrixRefSelect').value;
+    const repBtn = document.getElementById('matrixPrintableReportBtn');
+    const csvBtn = document.getElementById('matrixCsvReportBtn');
+    repBtn.href = `/api/karsilastirma-raporu-html?rfq_ref=${encodeURIComponent(ref)}`;
+    csvBtn.href = `/api/karsilastirma-raporu-csv?rfq_ref=${encodeURIComponent(ref)}`;
+
     const tbody = document.getElementById('matrixTableBody');
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px;">Analiz yapılıyor...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px;">Analiz yapılıyor...</td></tr>';
 
     try {
         const res = await fetch(`/api/karsilastirma-matrisi?rfq_ref=${encodeURIComponent(ref)}`);
@@ -490,7 +513,7 @@ async function loadMatrix() {
         const list = json.matrix || [];
 
         if (list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color:#64748b;">Karşılaştırılacak teklif bulunamadı.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px; color:#64748b;">Karşılaştırılacak teklif bulunamadı.</td></tr>';
             return;
         }
 
@@ -499,24 +522,33 @@ async function loadMatrix() {
             if (q.is_best_value) badges.push('<span class="badge badge-best">🏆 EN AVANTAJLI</span>');
             if (q.is_lowest_price) badges.push('<span class="badge" style="background:#e0f2fe; color:#0369a1;">🏷️ En Düşük Fiyat</span>');
             if (q.is_fastest_delivery) badges.push('<span class="badge" style="background:#fef3c7; color:#b45309;">⚡ En Hızlı</span>');
+            if (q.has_discount) badges.push('<span class="badge" style="background:#fce7f3; color:#be185d;">🏷️ İskontolu</span>');
+
+            const gross = parseFloat(q.total_amount) || 0;
+            const disc = parseFloat(q.discount_amount) || 0;
+            const discText = disc > 0 ? `-${disc.toLocaleString('tr-TR', {minimumFractionDigits: 2})}` : '-';
 
             return `
                 <tr style="${q.is_best_value ? 'background: #f0fdf4; font-weight:600;' : ''}">
                     <td><b>${escapeHtml(q.supplier_name)}</b><br><small style="color:#64748b;">${escapeHtml(q.tracking_code)}</small></td>
-                    <td><b>${Number(q.total_amount).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ${escapeHtml(q.currency)}</b></td>
+                    <td><b>${gross.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ${escapeHtml(q.currency)}</b></td>
+                    <td style="color:#dc2626;"><small>${discText}</small></td>
                     <td><small>${escapeHtml(q.payment_terms)}</small></td>
                     <td>${q.delivery_days} İş Günü</td>
                     <td><small>${escapeHtml(q.shipping_terms || 'DDP')}</small></td>
                     <td><span style="font-size:1.1rem; color:#2563eb; font-weight:800;">${q.score}</span> / 100</td>
                     <td>${badges.join(' ')}</td>
                     <td>
-                        <a href="/api/satin-alma-sozlesmesi?tracking_code=${encodeURIComponent(q.tracking_code)}" target="_blank" class="btn btn-primary" style="padding: 4px 8px; font-size: 0.78rem;">Sözleşme</a>
+                        <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                            <a href="/api/satin-alma-sozlesmesi?tracking_code=${encodeURIComponent(q.tracking_code)}" target="_blank" class="btn btn-primary" style="padding: 4px 8px; font-size: 0.75rem;">Sözleşme</a>
+                            <a href="/api/export-order-xml?tracking_code=${encodeURIComponent(q.tracking_code)}" target="_blank" class="btn" style="padding: 4px 8px; font-size: 0.75rem; background:#0284c7; color:white;">XML</a>
+                        </div>
                     </td>
                 </tr>
             `;
         }).join('');
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 20px; color:#dc2626;">Matris hesaplanırken hata oluştu.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 20px; color:#dc2626;">Matris hesaplanırken hata oluştu.</td></tr>';
     }
 }
 
@@ -588,9 +620,9 @@ async function updateCurrentStatus() {
 
 function exportCSV() {
     if (!allData || allData.length === 0) { alert('Dışa aktarılacak teklif verisi bulunamadı.'); return; }
-    let csv = '\uFEFFTeklif No,Tedarikçi,VKN,Yetkili,Telefon,E-posta,KEP,Kategori,Tutar,Para Birimi,Vade,Teslimat Gün,Geçerlilik,Durum\n';
+    let csv = '\uFEFFTeklif No,Tedarikçi,VKN,Yetkili,Telefon,E-posta,KEP,Kategori,Tutar,İskonto,Para Birimi,Vade,Teslimat Gün,Geçerlilik,Durum\n';
     allData.forEach(d => {
-        csv += `"${d.tracking_code || ''}","${d.supplier_name || ''}","${d.supplier_vkn || ''}","${d.contact_person || ''}","${d.supplier_phone || ''}","${d.supplier_email || ''}","${d.supplier_kep || ''}","${d.rfq_category || ''}","${d.total_amount || 0}","${d.currency || 'TRY'}","${d.payment_terms || ''}","${d.delivery_days || 1}","${d.validity_date || ''}","${d.status || 'Teklif Alındı'}"\n`;
+        csv += `"${d.tracking_code || ''}","${d.supplier_name || ''}","${d.supplier_vkn || ''}","${d.contact_person || ''}","${d.supplier_phone || ''}","${d.supplier_email || ''}","${d.supplier_kep || ''}","${d.rfq_category || ''}","${d.total_amount || 0}","${d.discount_amount || 0}","${d.currency || 'TRY'}","${d.payment_terms || ''}","${d.delivery_days || 1}","${d.validity_date || ''}","${d.status || 'Teklif Alındı'}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);

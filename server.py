@@ -2,7 +2,8 @@
 """
 server.py
 ---------
-KOBİ Tedarikçi Teklif Toplama, Karşılaştırma Matrisi ve KEP Sözleşme Sunucusu.
+KOBİ Tedarikçi Teklif Toplama, Karşılaştırma Matrisi, GİB UBL-TR 2.1 Order XML
+ve KEP Satın Alma Sözleşmesi Sunucusu.
 """
 
 import http.server
@@ -18,7 +19,13 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from scripts.rfq_comparison_engine import analyze_rfq_group, generate_acceptance_email
+from scripts.rfq_comparison_engine import (
+    analyze_rfq_group,
+    generate_acceptance_email,
+    generate_comparison_matrix_html,
+    generate_comparison_matrix_csv
+)
+from scripts.rfq_order_xml_generator import generate_ubl_order_xml
 from scripts.kep_purchase_contract import (
     validate_kep_address,
     generate_contract_html,
@@ -46,6 +53,7 @@ def init_db():
             rfq_category TEXT,
             rfq_ref TEXT,
             total_amount REAL,
+            discount_amount REAL DEFAULT 0.0,
             currency TEXT,
             payment_terms TEXT,
             delivery_days INTEGER,
@@ -56,11 +64,13 @@ def init_db():
             created_at TEXT
         )
     """)
-    # supplier_kep kolonu eski tablolarda yoksa ekle
+    # Kolon göçlerini (migrations) kontrol et
     cur.execute("PRAGMA table_info(rfq_quotes)")
     cols = [col[1] for col in cur.fetchall()]
     if "supplier_kep" not in cols:
         cur.execute("ALTER TABLE rfq_quotes ADD COLUMN supplier_kep TEXT DEFAULT ''")
+    if "discount_amount" not in cols:
+        cur.execute("ALTER TABLE rfq_quotes ADD COLUMN discount_amount REAL DEFAULT 0.0")
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS settings (
@@ -119,6 +129,12 @@ class RFQHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json(get_buyer_settings())
         elif path == "/api/karsilastirma-matrisi":
             self.handle_comparison_matrix(qs)
+        elif path == "/api/karsilastirma-raporu-html":
+            self.handle_comparison_report_html(qs)
+        elif path == "/api/karsilastirma-raporu-csv":
+            self.handle_comparison_report_csv(qs)
+        elif path == "/api/export-order-xml":
+            self.handle_export_order_xml(qs)
         elif path == "/api/satin-alma-sozlesmesi":
             self.handle_purchase_contract(qs)
         elif path == "/api/kabul-eposta":
@@ -188,10 +204,10 @@ class RFQHandler(http.server.SimpleHTTPRequestHandler):
                 INSERT INTO rfq_quotes (
                     tracking_code, supplier_name, supplier_vkn, contact_person,
                     supplier_phone, supplier_email, supplier_city, supplier_kep,
-                    rfq_category, rfq_ref, total_amount, currency, payment_terms,
+                    rfq_category, rfq_ref, total_amount, discount_amount, currency, payment_terms,
                     delivery_days, validity_date, shipping_terms, quote_details,
                     status, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 tracking_code,
                 data.get("supplier_name", ""),
@@ -204,6 +220,7 @@ class RFQHandler(http.server.SimpleHTTPRequestHandler):
                 data.get("rfq_category", ""),
                 data.get("rfq_ref", ""),
                 float(data.get("total_amount", 0)),
+                float(data.get("discount_amount", 0)),
                 data.get("currency", "TRY"),
                 data.get("payment_terms", ""),
                 int(data.get("delivery_days", 1)),
@@ -253,6 +270,82 @@ class RFQHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json({"status": "success", "matrix": analysis, "count": len(analysis)})
         except Exception as e:
             self.send_json({"status": "error", "message": str(e)}, status=500)
+
+    def handle_comparison_report_html(self, qs):
+        ref_filter = qs.get("rfq_ref", [""])[0]
+        cat_filter = qs.get("category", [""])[0]
+
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            if ref_filter:
+                cur.execute("SELECT * FROM rfq_quotes WHERE rfq_ref = ?", (ref_filter,))
+            elif cat_filter:
+                cur.execute("SELECT * FROM rfq_quotes WHERE rfq_category = ?", (cat_filter,))
+            else:
+                cur.execute("SELECT * FROM rfq_quotes")
+            rows = [dict(r) for r in cur.fetchall()]
+            conn.close()
+
+            buyer = get_buyer_settings()
+            report_title = ref_filter or cat_filter or "Tüm Teklifler"
+            html = generate_comparison_matrix_html(report_title, rows, buyer)
+            body = html.encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        except Exception as e:
+            self.send_error(500, str(e))
+
+    def handle_comparison_report_csv(self, qs):
+        ref_filter = qs.get("rfq_ref", [""])[0]
+        cat_filter = qs.get("category", [""])[0]
+
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            if ref_filter:
+                cur.execute("SELECT * FROM rfq_quotes WHERE rfq_ref = ?", (ref_filter,))
+            elif cat_filter:
+                cur.execute("SELECT * FROM rfq_quotes WHERE rfq_category = ?", (cat_filter,))
+            else:
+                cur.execute("SELECT * FROM rfq_quotes")
+            rows = [dict(r) for r in cur.fetchall()]
+            conn.close()
+
+            report_title = ref_filter or cat_filter or "genel"
+            csv_text = generate_comparison_matrix_csv(report_title, rows)
+            body = csv_text.encode("utf-8")
+            safe_filename = f"teklif_karsilastirma_{report_title.replace(' ', '_')}.csv"
+            self.send_response(200)
+            self.send_header("Content-Type", "text/csv; charset=utf-8")
+            self.send_header("Content-Disposition", f'attachment; filename="{safe_filename}"')
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        except Exception as e:
+            self.send_error(500, str(e))
+
+    def handle_export_order_xml(self, qs):
+        tracking_code = qs.get("tracking_code", [""])[0]
+        quote = self.get_quote_by_code(tracking_code)
+        if not quote:
+            self.send_error(404, f"'{tracking_code}' takip kodlu teklif bulunamadı.")
+            return
+
+        buyer = get_buyer_settings()
+        xml_content = generate_ubl_order_xml(quote, buyer)
+        body = xml_content.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "application/xml; charset=utf-8")
+        self.send_header("Content-Disposition", f'attachment; filename="siparis_{tracking_code}.xml"')
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
 
     def handle_purchase_contract(self, qs):
         tracking_code = qs.get("tracking_code", [""])[0]
