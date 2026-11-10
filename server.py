@@ -1,3 +1,4 @@
+VADE_ISKONTO_CARPANI = {'pesin_indirim': 0.05, '30_gun': 0.0, '60_gun': 0.04}
 # -*- coding: utf-8 -*-
 """
 server.py
